@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily News Module | OpenClaw Mission Control</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Flatpickr for Date Selection -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -560,6 +563,22 @@
             color: var(--text-muted);
         }
 
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--accent-cyan);
+            opacity: 0.6;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            border: 1px dashed rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
         .loading-spinner {
             width: 40px;
             height: 40px;
@@ -846,6 +865,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="news.js"></script>
 </body>
 

@@ -23,14 +23,30 @@ document.addEventListener('DOMContentLoaded', () => {
     initSyncButton();
 });
 
-// Set date picker to today
-function initDatePicker() {
+// Initialize date picker using Flatpickr and restrict available dates
+async function initDatePicker() {
     const today = new Date().toISOString().split('T')[0];
     newsDateInput.value = today;
-    newsDateInput.max = today;
 
-    newsDateInput.addEventListener('change', () => {
-        loadNews(newsDateInput.value);
+    // Fetch allowed dates from the backend
+    let availableDates = [today];
+    try {
+        const response = await fetch('/api/news/dates');
+        if (response.ok) {
+            availableDates = await response.json();
+        }
+    } catch (e) {
+        console.error('Failed to load historical dates:', e);
+    }
+
+    // Attach Flatpickr
+    flatpickr(newsDateInput, {
+        defaultDate: today,
+        enable: availableDates,
+        dateFormat: "Y-m-d",
+        onChange: function (selectedDates, dateStr, instance) {
+            loadNews(dateStr);
+        }
     });
 }
 
@@ -127,7 +143,15 @@ function renderColumn(type, container, countEl, countSuffix, isAI = false) {
             container.innerHTML = `<div class="ai-scrollable-feed">${html}</div>`;
             countEl.textContent = `${countSuffix}${items.length}`;
         } else {
-            container.innerHTML = `<div class="loading-state"><span>No ${type} news available</span></div>`;
+            container.innerHTML = `<div class="empty-state">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" style="margin-bottom: 8px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>NO DATA ARCHIVED</span>
+                <span style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Historical feed unavailable for this date</span>
+            </div>`;
             countEl.textContent = `${countSuffix}0`;
         }
         return;
@@ -155,7 +179,15 @@ function renderColumn(type, container, countEl, countSuffix, isAI = false) {
         container.innerHTML = html;
         countEl.textContent = type === 'tech' ? `${String(items.length).padStart(2, '0')} ${countSuffix}` : `${items.length} ${countSuffix}`;
     } else {
-        container.innerHTML = `<div class="loading-state"><span>No ${type} news available</span></div>`;
+        container.innerHTML = `<div class="empty-state">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" style="margin-bottom: 8px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>NO DATA ARCHIVED</span>
+            <span style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Historical feed unavailable for this date</span>
+        </div>`;
         countEl.textContent = type === 'tech' ? `00 ${countSuffix}` : `0 ${countSuffix}`;
     }
 }
